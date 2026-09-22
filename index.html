@@ -47,7 +47,7 @@
 
     <div class="form-group">
       <label>No <span>*</span></label>
-      <input type="number" id="noInput" placeholder="Mengambil nomor..." readonly required>
+      <input type="number" id="noInput" value="1" readonly required>
     </div>
 
     <div class="form-group">
@@ -85,22 +85,27 @@
     if (savedName) {
       document.getElementById('diinputOleh').value = savedName;
       updateAutoNumber();
+    } else {
+      document.getElementById('noInput').value = 1;
     }
   };
 
   function updateAutoNumber() {
     const nama = document.getElementById('diinputOleh').value;
     if (!nama) {
-      document.getElementById('noInput').value = "";
+      document.getElementById('noInput').value = 1;
       return;
     }
 
     fetch(APPS_SCRIPT_URL + "?nama=" + encodeURIComponent(nama))
       .then(response => response.json())
       .then(data => {
-        document.getElementById('noInput').value = data.nextNo;
+        document.getElementById('noInput').value = data.nextNo || 1;
       })
-      .catch(error => console.error("Gagal mengambil nomor:", error));
+      .catch(error => {
+        console.error("Gagal mengambil nomor:", error);
+        document.getElementById('noInput').value = 1;
+      });
   }
 
   function openScanner() {
@@ -122,7 +127,7 @@
   function resetForm() {
     document.getElementById('mainForm').reset();
     localStorage.removeItem("saved_diinputOleh");
-    document.getElementById('noInput').value = "";
+    document.getElementById('noInput').value = 1;
   }
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
