@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner Barcode</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
+    #reader { width: 100%; max-width: 500px; margin: 0 auto; background: white; padding: 10px; border-radius: 8px; }
+    #status { margin-top: 15px; font-weight: bold; font-size: 1.1em; color: #333; }
+  </style>
+</head>
+<body>
+
+  <h2>Scan Barcode / QR Code</h2>
+  <div id="reader"></div>
+  <div id="status">Arahkan kamera ke Barcode</div>
+
+  <script>
+    const APPS_SCRIPT_URL = "PASANG_URL_WEB_APP_ANDA_DI_SINI";
+
+    let isScanning = true;
+
+    function onScanSuccess(decodedText, decodedResult) {
+      if (!isScanning) return; 
+      isScanning = false;
+
+      document.getElementById('status').innerText = "Mengirim data: " + decodedText + "...";
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ barcode: decodedText })
+      })
+      .then(() => {
+        document.getElementById('status').innerText = "✅ Berhasil disimpan: " + decodedText;
+        setTimeout(() => { 
+          isScanning = true; 
+          document.getElementById('status').innerText = "Arahkan kamera ke Barcode"; 
+        }, 3000);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById('status').innerText = "❌ Gagal mengirim data.";
+        setTimeout(() => { isScanning = true; }, 3000);
+      });
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", 
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      false
+    );
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
+
+</body>
+</html>
