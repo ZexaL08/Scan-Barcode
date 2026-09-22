@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Input Barcode</title>
+  <title>Form Input Barcode Auto Number</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
@@ -14,8 +14,8 @@
     label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; font-size: 14px; }
     label span { color: #007bff; }
     
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; outline: none;
+    input[type="text"] {
+      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; outline: none; background: white;
     }
     
     .barcode-input-container { position: relative; display: flex; align-items: center; }
@@ -24,7 +24,6 @@
       position: absolute; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #555;
     }
 
-    /* Modal Scanner Camera */
     #scanner-modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; flex-direction: column;
@@ -43,10 +42,10 @@
 
 <div class="container">
   <form id="mainForm">
-    
+
     <div class="form-group">
-      <label>No <span>*</span></label>
-      <input type="number" id="noInput" placeholder="Masukkan Nomor" required>
+      <label>Diinput Oleh <span>*</span></label>
+      <input type="text" id="diinputOleh" placeholder="Masukkan Nama Petugas" required>
     </div>
 
     <div class="form-group">
@@ -65,7 +64,6 @@
   </form>
 </div>
 
-<!-- Modal Scanner Camera -->
 <div id="scanner-modal">
   <div id="reader"></div>
   <button class="close-modal" onclick="closeScanner()">Tutup Scanner</button>
@@ -99,7 +97,7 @@
     e.preventDefault();
 
     const formData = {
-      no: document.getElementById('noInput').value,
+      diinputOleh: document.getElementById('diinputOleh').value,
       noChasis: document.getElementById('noChasis').value
     };
 
@@ -111,7 +109,7 @@
     })
     .then(() => {
       alert("Data berhasil dikirim!");
-      resetForm();
+      document.getElementById('noChasis').value = "";
     })
     .catch(error => alert("Gagal mengirim data: " + error));
   });
