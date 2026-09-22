@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Input Barcode Auto Number</title>
+  <title>Form Input Barcode</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
@@ -70,8 +70,15 @@
 </div>
 
 <script>
-  const APPS_SCRIPT_URL = "PASANG_URL_WEB_APP_ANDA_DI_SINI";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyftaYqUFKALas4Er3MUIf0XW5ipbZ6YLyTM1qntXPZSoVll12YWaORYbUVa1TOz75V/exec";
   let html5QrcodeScanner;
+
+  window.onload = function() {
+    const savedName = localStorage.getItem("saved_diinputOleh");
+    if (savedName) {
+      document.getElementById('diinputOleh').value = savedName;
+    }
+  };
 
   function openScanner() {
     document.getElementById('scanner-modal').style.display = 'flex';
@@ -91,14 +98,20 @@
 
   function resetForm() {
     document.getElementById('mainForm').reset();
+    localStorage.removeItem("saved_diinputOleh");
   }
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const diinputOlehVal = document.getElementById('diinputOleh').value;
+    const noChasisVal = document.getElementById('noChasis').value;
+
+    localStorage.setItem("saved_diinputOleh", diinputOlehVal);
+
     const formData = {
-      diinputOleh: document.getElementById('diinputOleh').value,
-      noChasis: document.getElementById('noChasis').value
+      diinputOleh: diinputOlehVal,
+      noChasis: noChasisVal
     };
 
     fetch(APPS_SCRIPT_URL, {
