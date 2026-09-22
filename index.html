@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner Barcode</title>
+  <title>Scanner Barcode Besar</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
-    #reader { width: 100%; max-width: 500px; margin: 0 auto; background: white; padding: 10px; border-radius: 8px; }
-    #status { margin-top: 15px; font-weight: bold; font-size: 1.1em; color: #333; }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 10px; background: #f4f4f9; margin: 0; }
+    #reader { width: 100%; max-width: 800px; margin: 0 auto; background: white; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+    #status { margin-top: 15px; font-weight: bold; font-size: 1.2em; color: #333; }
+    #reader video { width: 100% !important; height: auto !important; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -18,7 +19,7 @@
   <div id="status">Arahkan kamera ke Barcode</div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyftaYqUFKALas4Er3MUIf0XW5ipbZ6YLyTM1qntXPZSoVll12YWaORYbUVa1TOz75V/exec";
+    const APPS_SCRIPT_URL = "PASANG_URL_WEB_APP_ANDA_DI_SINI";
 
     let isScanning = true;
 
@@ -50,7 +51,11 @@
 
     const html5QrcodeScanner = new Html5QrcodeScanner(
       "reader", 
-      { fps: 10, qrbox: { width: 500, height: 500 } },
+      { 
+        fps: 10, 
+        qrbox: { width: 400, height: 400 },
+        aspectRatio: 1.0
+      },
       false
     );
     html5QrcodeScanner.render(onScanSuccess);
