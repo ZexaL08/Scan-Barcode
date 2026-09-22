@@ -14,9 +14,11 @@
     label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; font-size: 14px; }
     label span { color: #007bff; }
     
-    input[type="text"] {
+    input[type="text"], input[type="number"] {
       width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; outline: none; background: white;
     }
+    
+    input[readonly] { background-color: #e9ecef; color: #495057; cursor: not-allowed; }
     
     .barcode-input-container { position: relative; display: flex; align-items: center; }
     .barcode-input-container input { padding-right: 45px; }
@@ -44,14 +46,19 @@
   <form id="mainForm">
 
     <div class="form-group">
+      <label>No <span>*</span></label>
+      <input type="number" id="noInput" placeholder="Mengambil nomor..." readonly required>
+    </div>
+
+    <div class="form-group">
       <label>Diinput Oleh <span>*</span></label>
-      <input type="text" id="diinputOleh" placeholder="Masukkan Nama Petugas" required>
+      <input type="text" id="diinputOleh" placeholder="Masukkan Nama Petugas" oninput="updateAutoNumber()" required>
     </div>
 
     <div class="form-group">
       <label>Kode Barcode / No Chasis <span>*</span></label>
       <div class="barcode-input-container">
-        <input type="text" id="noChasis" placeholder="Scan atau ketik..." required>
+        <input type="text" id="kodeBarcode" placeholder="Scan atau ketik barcode..." required>
         <button type="button" class="scan-icon-btn" onclick="openScanner()">📷</button>
       </div>
     </div>
@@ -77,14 +84,30 @@
     const savedName = localStorage.getItem("saved_diinputOleh");
     if (savedName) {
       document.getElementById('diinputOleh').value = savedName;
+      updateAutoNumber();
     }
   };
+
+  function updateAutoNumber() {
+    const nama = document.getElementById('diinputOleh').value;
+    if (!nama) {
+      document.getElementById('noInput').value = "";
+      return;
+    }
+
+    fetch(APPS_SCRIPT_URL + "?nama=" + encodeURIComponent(nama))
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('noInput').value = data.nextNo;
+      })
+      .catch(error => console.error("Gagal mengambil nomor:", error));
+  }
 
   function openScanner() {
     document.getElementById('scanner-modal').style.display = 'flex';
     html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
     html5QrcodeScanner.render((decodedText) => {
-      document.getElementById('noChasis').value = decodedText;
+      document.getElementById('kodeBarcode').value = decodedText;
       closeScanner();
     });
   }
@@ -99,19 +122,22 @@
   function resetForm() {
     document.getElementById('mainForm').reset();
     localStorage.removeItem("saved_diinputOleh");
+    document.getElementById('noInput').value = "";
   }
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const noVal = document.getElementById('noInput').value;
     const diinputOlehVal = document.getElementById('diinputOleh').value;
-    const noChasisVal = document.getElementById('noChasis').value;
+    const kodeBarcodeVal = document.getElementById('kodeBarcode').value;
 
     localStorage.setItem("saved_diinputOleh", diinputOlehVal);
 
     const formData = {
+      no: noVal,
       diinputOleh: diinputOlehVal,
-      noChasis: noChasisVal
+      kodeBarcode: kodeBarcodeVal
     };
 
     fetch(APPS_SCRIPT_URL, {
@@ -122,7 +148,8 @@
     })
     .then(() => {
       alert("Data berhasil dikirim!");
-      document.getElementById('noChasis').value = "";
+      document.getElementById('kodeBarcode').value = "";
+      updateAutoNumber();
     })
     .catch(error => alert("Gagal mengirim data: " + error));
   });
